@@ -1,24 +1,5 @@
-# README
+# 설명
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+채팅 중 약속 내용 인식하여 알람 생성
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+* 주소 인식 : 도로명 주소, 지번 주소를 정규식으로 인식 DB 내 쿼리를 통해 최종  
