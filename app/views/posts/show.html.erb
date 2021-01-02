@@ -1,0 +1,75 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Partner:</strong>
+  <%= @post.partner %>
+</p>
+
+<% if @post.address %>
+<p>
+  <strong>Address:</strong>
+  <%= @post.address %>
+</p>
+<% end %>
+
+<% if @post.phone %>
+<p>
+  <strong>Phone:</strong>
+  <%= @post.phone %>
+</p>
+<% end %>
+
+<% if @post.date %>
+<p>
+  <strong>Date:</strong>
+  <%= @post.date %>
+</p>
+<% end %>
+
+<% if @post.time %>
+<p>
+  <strong>Time:</strong>
+  <%= @post.time %>
+</p>
+<% end %>
+
+<% if @post.time_ago %>
+<p>
+  <strong>Time_ago:</strong>
+  <%= @post.time_ago %>
+</p>
+<% end %>
+
+<%= link_to 'Edit', edit_post_path(@post) %> |
+<%= link_to 'Back', posts_path %>
+<hr>
+<h3>Chats</h3>
+
+<div id="chatbox" style="height:30vh;width:45vh;overflow:scroll;">
+<table>
+  <thead>
+    <tr>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @chats.each do |chat| %>
+      <tr>
+        <td style="width:30vh"><%= chat.body %></td>
+        <td>&nbsp</td>
+        <td><%= link_to ' 삭제', chat, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+<br>
+
+
+<%= render 'chats/form', chat: @chat %>
+
+<script>
+  var objDiv = document.getElementById("chatbox")
+  objDiv.scrollTop = objDiv.scrollHeight;
+</script>
