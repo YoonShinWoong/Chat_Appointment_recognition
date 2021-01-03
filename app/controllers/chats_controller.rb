@@ -49,6 +49,8 @@ class ChatsController < ApplicationController
           notice_msg = '구체적인 약속 장소가 이야기되고 있네요!'
         end
 
+        # 약속 날짜 체크
+
         format.html { redirect_to @post, notice: notice_msg }
         format.json { render :show, status: :created, location: @chat }
       else
@@ -125,5 +127,180 @@ class ChatsController < ApplicationController
 
       # 지번 주소 아님 false
       return false
+    end
+
+    # 약속 날짜 체크
+    def korean_day_check(str)
+
+      # 며칠 뒤의 날짜인지 체크
+      plus_date = nil
+      if str.match(/(오늘)|(금일)/)
+        plus_date = 0
+      elsif str.match(/(내일)|(차일)/)
+        plus_date = 1
+      elsif str.match(/(모레)|(이틀)/) 
+        plus_date = 2
+      elsif str.match(/(사흘)/)
+        plus_date = 3
+      elsif str.match(/(나흘)/)
+        plus_date = 4 
+      elsif str.match(/(닷새)/)
+        plus_date = 5
+      end
+      
+      if plus_date
+        return DateTime.now + plus_date.days
+      else
+        return nil
+      end
+    end
+
+    # 약속 날짜 요일 체크
+    def only_wday_check(str)
+      when_wday = nil
+
+      # 이번주 요일 검색
+      if str.match(/[월](요일|욜|)/) 
+        when_wday = 0
+        plus_week = 0
+      elsif str.match(/(이번|이번 |금)[주]\s[화](요일|욜|)/) 
+        when_wday = 1
+        plus_week = 0 
+      elsif str.match(/(이번|이번 |금)[주]\s[수](요일|욜|)/) 
+        when_wday = 2
+        plus_week = 0
+      elsif str.match(/(이번|이번 |금)[주]\s[목](요일|욜|)/) 
+        when_wday = 3
+        plus_week = 0
+      elsif str.match(/(이번|이번 |금)[주]\s[금](요일|욜|)/) 
+        when_wday = 4
+        plus_week = 0 
+      elsif str.match(/(이번|이번 |금)[주]\s[토](요일|욜|)/)
+        when_wday = 5
+        plus_week = 0
+      elsif str.match(/(이번|이번 |금)[주]\s[일](요일|욜|)/) 
+        when_wday = 6
+        plus_week = 0
+      end
+
+      # 파싱 안되면 nil 반환
+      if plus_week || when_wday
+        return nil
+      
+      # 파싱되면 날짜 차이 계산
+      else
+        # 일 0 ~ 토 6 (변환)=> 월 0 ~ 일 6
+        now_wday = (DateTime.now.wday-1) % 7
+        plus_wday = when_wday - now_wday
+
+        # 변환 날짜 계산 후 반환
+        return DateTiem.now + (plus_wday + (plus_week)*7).days
+      end
+    end
+
+
+    # 약속 날짜 요일 체크
+    def wday_check(str)
+      
+      plus_week = nil
+      when_wday = nil
+
+      # 이번주 요일 검색
+      if str.match(/(이번|이번 |금)[주]\s[월](요일|욜|)/) 
+        when_wday = 0
+        plus_week = 0
+      elsif str.match(/(이번|이번 |금)[주]\s[화](요일|욜|)/) 
+        when_wday = 1
+        plus_week = 0 
+      elsif str.match(/(이번|이번 |금)[주]\s[수](요일|욜|)/) 
+        when_wday = 2
+        plus_week = 0
+      elsif str.match(/(이번|이번 |금)[주]\s[목](요일|욜|)/) 
+        when_wday = 3
+        plus_week = 0
+      elsif str.match(/(이번|이번 |금)[주]\s[금](요일|욜|)/) 
+        when_wday = 4
+        plus_week = 0 
+      elsif str.match(/(이번|이번 |금)[주]\s[토](요일|욜|)/)
+        when_wday = 5
+        plus_week = 0
+      elsif str.match(/(이번|이번 |금)[주]\s[일](요일|욜|)/) 
+        when_wday = 6
+        plus_week = 0
+      end
+
+      # 다음주 요일 검색
+      if str.match(/(다음|다음 |차)[주]\s[월](요일|욜|)/) 
+        when_wday = 0
+        plus_week = 1
+      elsif str.match(/(다음|다음 |차)[주]\s[화](요일|욜|)/) 
+        when_wday = 1
+        plus_week = 1
+      elsif str.match(/(다음|다음 |차)[주]\s[수](요일|욜|)/) 
+        when_wday = 2
+        plus_week = 1
+      elsif str.match(/(다음|다음 |차)[주]\s[목](요일|욜|)/) 
+        when_wday = 3
+        plus_week = 1
+      elsif str.match(/(다음|다음 |차)[주]\s[금](요일|욜|)/) 
+        when_wday = 4
+        plus_week = 1 
+      elsif str.match(/(다음|다음 |차)[주]\s[토](요일|욜|)/)
+        when_wday = 5
+        plus_week = 1
+      elsif str.match(/(다음|다음 |차)[주]\s[일](요일|욜|)/) 
+        when_wday = 6
+        plus_week = 1
+      end
+
+      # <주 + 요일> 파싱 안되면 단순 <요일> 파싱 
+      if plus_week.nil? && when_wday.nil?
+        
+        if str.match(/[월](요일|욜)/) 
+          when_wday = 0
+        elsif str.match(/[화](요일|욜)/) 
+          when_wday = 1
+        elsif str.match(/[수](요일|욜)/) 
+          when_wday = 2
+        elsif str.match(/[목](요일|욜)/) 
+          when_wday = 3
+        elsif str.match(/[금](요일|욜)/) 
+          when_wday = 4
+        elsif str.match(/[토](요일|욜)/) 
+          when_wday = 5
+        elsif str.match(/[일](요일|욜)/) 
+          when_wday = 6
+        end
+
+        # 단순 요일 파싱도 안되면 처리
+        if when_wday.nil? 
+          return nil
+
+        # 단순 요일 파싱되면 처리
+        else
+          # 일 0 ~ 토 6 (변환)=> 월 0 ~ 일 6
+          now_wday = (DateTime.now.wday-1) % 7
+          
+          if when_wday > now_wday
+            plus_wday = (when_wday - now_wday) 
+          
+          else
+            plus_wday = (when_wday + 7) - now_wday
+          
+          end
+          # 변환 날짜 계산 후 반환
+          return DateTiem.now + plus_wday.days
+        
+        end
+
+      # 파싱되면 날짜 차이 계산
+      else
+        # 일 0 ~ 토 6 (변환)=> 월 0 ~ 일 6
+        now_wday = (DateTime.now.wday-1) % 7
+        plus_wday = when_wday - now_wday
+
+        # 변환 날짜 계산 후 반환
+        return DateTiem.now + (plus_wday + (plus_week)*7).days
+      end
     end
 end
