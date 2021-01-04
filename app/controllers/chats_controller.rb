@@ -97,6 +97,7 @@ class ChatsController < ApplicationController
       params.require(:chat).permit(:post_id, :body)
     end
 
+    # 주소검색 <1>
     # 도로명 주소 검색 
     def street_address_check(str)
       addr_str = str.match(/(([가-힣A-Za-z·\d~\-\.]{2,}(로|길).[\d]+))/)
@@ -113,6 +114,7 @@ class ChatsController < ApplicationController
       return false
     end
 
+    # 주소검색 <2>
     # 지번 주소 검색 
     def lot_address_check(str)
       addr_str = str.match(/(([가-힣A-Za-z·\d~\-\.]+(읍|동)\s)[\d-]+)|(([가-힣A-Za-z·\d~\-\.]+(읍|동)\s)[\d]+)/)
@@ -129,8 +131,9 @@ class ChatsController < ApplicationController
       return false
     end
 
+    # 날짜검색 <1>
     # 약속 날짜 체크
-    def korean_day_check(str)
+    def korean_date_check(str)
 
       # 며칠 뒤의 날짜인지 체크
       plus_date = nil
@@ -149,13 +152,14 @@ class ChatsController < ApplicationController
       end
       
       if plus_date
-        return DateTime.now + plus_date.days
+        return Date.today_to_datetime + plus_date.days
       else
         return nil
       end
     end
 
-    # 약속 날짜 요일 체크
+    # 날짜검색 <2>
+    # 약속 날짜 요일만 체크
     def only_wday_check(str)
       when_wday = nil
 
@@ -190,15 +194,16 @@ class ChatsController < ApplicationController
       # 파싱되면 날짜 차이 계산
       else
         # 일 0 ~ 토 6 (변환)=> 월 0 ~ 일 6
-        now_wday = (DateTime.now.wday-1) % 7
+        now_wday = (Date.today_to_datetime.wday-1) % 7
         plus_wday = when_wday - now_wday
 
         # 변환 날짜 계산 후 반환
-        return DateTiem.now + (plus_wday + (plus_week)*7).days
+        return Date.today_to_datetime + (plus_wday + (plus_week)*7).days
       end
     end
 
 
+    # 날짜검색 <3>
     # 약속 날짜 요일 체크
     def wday_check(str)
       
@@ -279,7 +284,7 @@ class ChatsController < ApplicationController
         # 단순 요일 파싱되면 처리
         else
           # 일 0 ~ 토 6 (변환)=> 월 0 ~ 일 6
-          now_wday = (DateTime.now.wday-1) % 7
+          now_wday = (Date.today_to_datetime.wday-1) % 7
           
           if when_wday > now_wday
             plus_wday = (when_wday - now_wday) 
@@ -289,18 +294,73 @@ class ChatsController < ApplicationController
           
           end
           # 변환 날짜 계산 후 반환
-          return DateTiem.now + plus_wday.days
+          return Date.today_to_datetime + plus_wday.days
         
         end
 
       # 파싱되면 날짜 차이 계산
       else
         # 일 0 ~ 토 6 (변환)=> 월 0 ~ 일 6
-        now_wday = (DateTime.now.wday-1) % 7
+        now_wday = (Date.today_to_datetime.wday-1) % 7
         plus_wday = when_wday - now_wday
 
         # 변환 날짜 계산 후 반환
-        return DateTiem.now + (plus_wday + (plus_week)*7).days
+        return Date.today_to_datetime + (plus_wday + (plus_week)*7).days
       end
+    end
+
+    # 날짜검색 <4>
+    # 약속 날짜 체크 
+    def date_check(str)
+      slash_date_str = str.match(/[0-1]?[0-9]\/[0-3]?[0-9]/)
+      korean_date_str = str.match(/([0-1]?[0-9]월\s[0-3]?[0-9]일)|([0-1]?[0-9]월[0-3]?[0-9]일)/)
+
+      # 00/00
+      if slash_date_str
+        # 내년을 말한 것인지 체크 
+        slash_date = slash_date_str.to_s.to_date.
+        if slash_date.change(year:0) < Date.today.change(year:0)
+          return slash_date + 1.year
+        else
+          return slash_date
+        end
+      
+      # 00월 00일
+      elsif korean_date_str
+        str_list = korean_date_str.to_s.split('월')
+        # 내년을 말한 것인지 체크 
+        korean_date = (str_list[0]+"/"+str_list[1]).to_date
+        if korean_date.change(year:0) < Date.today.change(year:0)
+          return korean_date + 1.year
+        else
+          return korean_date
+        end
+      end  
+    end
+
+    # 날짜검색 <5>
+    # 약속 시간 체크
+    def time_check(str)
+      hour_minute_str = str.match(/([0-2]?[0-9]시[0-5][0-9]분)|([0-2]?[0-9]시\s[0-5][0-9]분)|([0-2]?[0-9]시)/)
+      colon_time_str = str.match(/([0-2]?[0-9]:[0-5]?[0-9])/)
+      
+      # 00시 00분 , 00시00분, 00시
+      if hour_minute_str
+        str_list = hour_minute_str.to_s.split('시')
+        if str_list.size == 1 
+          return (str_list[0].to_i + 12).hours
+        else 
+          return (str_list[0].to_i + 12).hours + str_list[1].to_i.minutes
+        end
+      end
+
+      # 00:00
+      elsif colon_time_str 
+        str_list = colon_time_str.to_s.split(':')
+        return (str_list[0].to_i + 12).hours + str_list[1].to_i.minutes
+      end
+
+      # 파싱 안됨
+      return nil
     end
 end
