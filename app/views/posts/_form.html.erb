@@ -11,39 +11,40 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= form.label :partner %>
-    <%= form.text_field :partner %>
-  </div>
+  <% if @check == 'new' %>
+    <div class="field">
+      <%= form.label :partner %>
+      <%= form.text_field :partner %>
+    </div>
+  <% else %>
 
-  <!--
-  <div class="field">
-    <%= form.label :address %>
-    <%= form.text_field :address %>
-  </div>
-  
-  
-  <div class="field">
-    <%= form.label :phone %>
-    <%= form.text_field :phone %>
-  </div>
-  
-  <div class="field">
-    <%= form.label :date %>
-    <%= form.date_select :date %>
-  </div>
+    <div class="field">
+    <%= form.label :알람 %>
+      <%= form.select(:alarmstat, ['대기','생성', '거부' ], {}, { :class => 'my_style_class' }) %>
+    </div>
 
-  <div class="field">
-    <%= form.label :time %>
-    <%= form.time_select :time %>
-  </div>
+    <div class="field">
+      <%= form.label :'알람 시간' %>
+      <%= form.datetime_local_field :time_ago %>
+    </div>
 
-  <div class="field">
-    <%= form.label :time_ago %>
-    <%= form.time_select :time_ago %>
-  </div>
-  -->
+    <div class="field">
+      <%= form.label :'약속 장소' %>
+      <%= form.text_field :address %>
+    </div>
+    
+    <div class="field">
+      <%= form.label :'약속 날짜' %>
+      <%= form.date_select :date %>
+    </div>
+
+    <div class="field">
+      <%= form.label :'약속 시간' %>
+      <%= form.time_select :time %>
+    </div>  
   
+    <% end %>
+
   <div class="actions">
     <%= form.submit %>
   </div>

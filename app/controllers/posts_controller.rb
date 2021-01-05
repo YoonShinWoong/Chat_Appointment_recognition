@@ -18,6 +18,7 @@ class PostsController < ApplicationController
   # GET /posts/new
   def new
     @post = Post.new
+    @check = 'new'
   end
 
   # GET /posts/1/edit
@@ -28,8 +29,6 @@ class PostsController < ApplicationController
   # POST /posts.json
   def create
     @post = Post.new(post_params)
-    @post.date = nil
-    @post.time = nil
 
     respond_to do |format|
       if @post.save
@@ -47,7 +46,7 @@ class PostsController < ApplicationController
   def update
     respond_to do |format|
       if @post.update(post_params)
-        format.html { redirect_to @post, notice: 'Post was successfully updated.' }
+        format.html { redirect_to @post, notice: '알람이 정상적으로 수정되었습니다!' }
         format.json { render :show, status: :ok, location: @post }
       else
         format.html { render :edit }
@@ -78,6 +77,22 @@ class PostsController < ApplicationController
     end
   end
 
+  # 알람 끄기
+  def alarmoff
+    @post = Post.find(params[:post_id])
+    @post.alarmstat = '거부'
+
+    respond_to do |format|
+      if @post.save
+        format.html { redirect_to @post, notice: '알람이 정상적으로 거부되었습니다! 다시 설정하고 싶으시면 언제든 알람 설정을 클릭해주세요!' }
+        format.json { render :show, status: :ok, location: @post }
+      else
+        format.html { render :edit }
+        format.json { render json: @post.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+  
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_post
@@ -86,6 +101,6 @@ class PostsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def post_params
-      params.require(:post).permit(:partner, :address, :phone, :date, :time, :time_ago)
+      params.require(:post).permit(:partner, :address, :phone, :date, :time, :time_ago, :alarmstat)
     end
 end

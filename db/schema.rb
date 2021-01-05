@@ -10,18 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_02_115441) do
-
-  create_table "Posts", force: :cascade do |t|
-    t.string "partner"
-    t.string "address"
-    t.string "phone"
-    t.date "date"
-    t.time "time"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.time "time_ago"
-  end
+ActiveRecord::Schema.define(version: 2021_01_05_153007) do
 
   create_table "addresses", force: :cascade do |t|
     t.string "city"
@@ -53,6 +42,18 @@ ActiveRecord::Schema.define(version: 2021_01_02_115441) do
     t.string "lot"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "posts", force: :cascade do |t|
+    t.string "partner"
+    t.string "address"
+    t.string "phone"
+    t.date "date"
+    t.time "time"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "time_ago"
+    t.string "alarmstat"
   end
 
   add_foreign_key "chats", "posts"

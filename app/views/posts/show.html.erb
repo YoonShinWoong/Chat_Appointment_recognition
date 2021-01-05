@@ -1,13 +1,28 @@
 <p id="notice"><%= notice %></p>
 
+
+<% if @post.alarmstat %>
 <p>
-  <strong>Partner:</strong>
+  <strong>알람:</strong>
+  <%= @post.alarmstat %>
+</p>
+<% end %>
+
+<% if @post.time_ago %>
+<p>
+  <strong>알람 시간:</strong>
+  <%= @post.time_ago %>
+</p>
+<% end %>
+
+<p>
+  <strong>약속 상대:</strong>
   <%= @post.partner %>
 </p>
 
 <% if @post.address %>
 <p>
-  <strong>Address:</strong>
+  <strong>약속 장소:</strong>
   <%= @post.address %>
 </p>
 <% end %>
@@ -21,31 +36,36 @@
 
 <% if @post.date %>
 <p>
-  <strong>Date:</strong>
+  <strong>약속 날짜:</strong>
   <%= @post.date %>
 </p>
 <% end %>
 
 <% if @post.time %>
 <p>
-  <strong>Time:</strong>
-  <%= @post.time %>
+  <strong>약속 시간:</strong>
+  <%= @post.time.hour %>시 <%= @post.time.min %>분
 </p>
 <% end %>
 
-<% if @post.time_ago %>
-<p>
-  <strong>Time_ago:</strong>
-  <%= @post.time_ago %>
-</p>
-<% end %>
 
-<%= link_to 'Edit', edit_post_path(@post) %> |
+  <% if @post.alarmstat != '거부' && @post.time && @post.date && @post.time_ago %>
+    <hr> 
+      <%= @post.partner %> 님과의 <span style="color:blue;"><%= @post.date %></span> 날짜   <span style="color:blue;"> <%= @post.time.hour %>시 <%= @post.time.min %>분</span> 시간으로 <br>
+      <span style="color:blue;"><%= @post.address %> </span> 에서 약속이 잡혔습니다~! <br>
+      <span style="color:red;"><%= @post.time_ago %> </span>에 알려드릴게요! :)
+    <hr>
+  <% end %>
+
+<%= link_to '알람 설정', edit_post_path(@post) %> |
+<a href="/posts/alarm_off/<%=@post.id%>">알람 거부</a>
+
+<br>
 <%= link_to 'Back', posts_path %>
 <hr>
 <h3>Chats</h3>
 
-<div id="chatbox" style="height:30vh;width:45vh;overflow:scroll;">
+<div id="chatbox" style="height:30vh;width:45vh;overflow:scroll;border:1px solid; border-radius:10px;">
 <table>
   <thead>
     <tr>
@@ -56,9 +76,8 @@
   <tbody>
     <% @chats.each do |chat| %>
       <tr>
+        <td> &nbsp 나 : </td>
         <td style="width:30vh"><%= chat.body %></td>
-        <td>&nbsp</td>
-        <td><%= link_to ' 삭제', chat, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
